@@ -1,10 +1,30 @@
 plugins {
     id 'java-library'
+    id 'maven-publish'
+    id 'org.springframework.boot' version '3.4.0' apply false
     id 'io.spring.dependency-management' version '1.1.7'
 }
 
 group = 'com.n4d3sh1k4'
 version = '1.0-SNAPSHOT'
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/n4d3sh1k4-reshala-developing/common-library-spring")
+            credentials {
+                username = System.getenv("GHP_USER")
+                password = System.getenv("GHP_TOKEN")
+            }
+        }
+    }
+}
 
 java {
     toolchain {
@@ -17,7 +37,6 @@ repositories {
 }
 
 dependencies {
-    // Нам нужен только веб-стартер для работы с JSON и ResponseEntity
     api 'org.springframework.boot:spring-boot-starter-json'
     api 'org.springframework:spring-webmvc'
     api 'org.springframework.boot:spring-boot-starter-validation'
