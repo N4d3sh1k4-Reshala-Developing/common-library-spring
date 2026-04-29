@@ -1,10 +1,12 @@
 package com.n4d3sh1k4.common.advice;
 
+import com.n4d3sh1k4.common.dto.ApiError;
 import com.n4d3sh1k4.common.dto.ApiResponse;
 import com.n4d3sh1k4.common.exception.BaseException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -43,6 +45,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN) // Код 403
                 .body(ApiResponse.error("ACCESS_DENIED", "You do not have sufficient permissions to perform this operation."));
+    }
+
+    @ExceptionHandler(DisabledException.class)
+    public ResponseEntity<ApiResponse<Void>> handleDisabledException(DisabledException ex) {
+        ApiError error = new ApiError(
+            "EMAIL_NOT_VERIFIED",
+            "Your account is not activated. Please confirm your email."
+        );
+        return new ResponseEntity<>(new ApiResponse<>(false, null, error, null), HttpStatus.FORBIDDEN);
     }
 
     // 3. Финальный перехватчик для всех остальных системных ошибок (500)
