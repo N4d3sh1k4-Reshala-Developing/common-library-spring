@@ -15,12 +15,10 @@ public class GlobalResponseHandler implements ResponseBodyAdvice<Object> {
 
     @Override
     public boolean supports(MethodParameter returnType, Class converterType) {
-        // 1. Включаемся ТОЛЬКО если Spring планирует отдать стандартный JSON через Jackson
         if (!MappingJackson2HttpMessageConverter.class.isAssignableFrom(converterType)) {
             return false;
         }
 
-        // 2. Полностью игнорируем внутренние пакеты самого Spring и библиотеки Springdoc
         String packageName = returnType.getContainingClass().getPackageName();
         if (packageName.startsWith("org.springdoc") ||
                 packageName.startsWith("org.springframework")) {

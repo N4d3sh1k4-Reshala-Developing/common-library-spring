@@ -60,7 +60,7 @@ public class GlobalExceptionHandler {
         ex.printStackTrace();
 
         return ResponseEntity
-        .status(500)
-        .body(ApiResponse.error("INTERNAL_SERVER_ERROR", "!!! ЭТО НОВЫЙ КОД !!! " + ex.getMessage()));
+                .status(500)
+                .body(ApiResponse.error("INTERNAL_SERVER_ERROR", "!!! ЭТО НОВЫЙ КОД !!! " + ex.getMessage()));
     }
 }
