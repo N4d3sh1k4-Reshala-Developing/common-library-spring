@@ -16,7 +16,6 @@ import java.nio.file.AccessDeniedException;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // 1. Обработка твоих кастомных ошибок (бизнес-логика)
     @ExceptionHandler(BaseException.class)
     public ResponseEntity<ApiResponse<Void>> handleBaseException(BaseException ex) {
         return ResponseEntity
@@ -24,7 +23,6 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error(ex.getCode(), ex.getMessage()));
     }
 
-    // 2. Обработка ошибок валидации (@Valid, @NotBlank и т.д.)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<Void>> handleValidation(MethodArgumentNotValidException ex) {
         String errorMessage = ex.getBindingResult().getFieldErrors().get(0).getDefaultMessage();
@@ -50,18 +48,19 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DisabledException.class)
     public ResponseEntity<ApiResponse<Void>> handleDisabledException(DisabledException ex) {
         ApiError error = new ApiError(
-            "EMAIL_NOT_VERIFIED",
-            "Your account is not activated. Please confirm your email."
+                "EMAIL_NOT_VERIFIED",
+                "Your account is not activated. Please confirm your email."
         );
         return new ResponseEntity<>(new ApiResponse<>(false, null, error, null), HttpStatus.FORBIDDEN);
     }
 
-    // 3. Финальный перехватчик для всех остальных системных ошибок (500)
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleGeneralException(Exception ex) {
-        // Здесь можно добавить логгирование: log.error("Unhandled exception: ", ex);
+        // КРИТИЧЕСКИ ВАЖНО: выводим стэк-трейс в консоль сервера
+        ex.printStackTrace();
+
         return ResponseEntity
-                .status(500)
-                .body(ApiResponse.error("INTERNAL_SERVER_ERROR", "An unexpected error occurred" + ex.getMessage()));
+        .status(500)
+        .body(ApiResponse.error("INTERNAL_SERVER_ERROR", "!!! ЭТО НОВЫЙ КОД !!! " + ex.getMessage()));
     }
 }
