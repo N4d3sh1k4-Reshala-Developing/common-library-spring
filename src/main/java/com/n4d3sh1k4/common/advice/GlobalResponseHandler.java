@@ -15,16 +15,11 @@ public class GlobalResponseHandler implements ResponseBodyAdvice<Object> {
 
     @Override
     public boolean supports(MethodParameter returnType, Class converterType) {
-        if (!MappingJackson2HttpMessageConverter.class.isAssignableFrom(converterType)) {
-            return false;
-        }
-
+        // ЗАЩИТА 1: Полностью игнорируем Сваггер и внутренности Spring на взлете
         String packageName = returnType.getContainingClass().getPackageName();
-        if (packageName.startsWith("org.springdoc") ||
-                packageName.startsWith("org.springframework")) {
+        if (packageName.startsWith("org.springdoc") || packageName.startsWith("org.springframework")) {
             return false;
         }
-
         return true;
     }
 
@@ -32,14 +27,21 @@ public class GlobalResponseHandler implements ResponseBodyAdvice<Object> {
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType,
                                   Class selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
 
-        if (body == null) {
-            return com.n4d3sh1k4.common.dto.ApiResponse.success(null);
-        }
-
-        if (body instanceof com.n4d3sh1k4.common.dto.ApiResponse || body instanceof String) {
+        // ЗАЩИТА 2 (Дублирующая): Если старый supports() застрял в кэше, этот блок спасет от ClassCastException.
+        // Если тело пустое, или это уже ApiResponse, или это МАССИВ БАЙТ ([B), или чистая строка — отдаем КАК ЕСТЬ!
+        if (body == null || body instanceof com.n4d3sh1k4.common.dto.ApiResponse || body instanceof byte[] || body instanceof String) {
             return body;
         }
 
+        // Защита для файлов/ресурсов
+        if (body instanceof org.springframework.core.io.Resource) {
+            return body;
+        }
+
+        // Только бизнес-объекты упаковываем в успех
         return com.n4d3sh1k4.common.dto.ApiResponse.success(body);
+
+
+        //
     }
 }

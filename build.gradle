@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'com.n4d3sh1k4'
-version = '1.0-SNAPSHOT'
+version = '1.1-SNAPSHOT'
 
 publishing {
     publications {
@@ -37,9 +37,12 @@ repositories {
 
 dependencies {
     api platform("org.springframework.boot:spring-boot-dependencies:3.4.0")
-
     api 'org.springframework.boot:spring-boot-starter-json'
     api 'org.springframework:spring-webmvc'
     api 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.security:spring-security-core'
+}
+
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
