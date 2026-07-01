@@ -56,11 +56,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleGeneralException(Exception ex) {
-        // КРИТИЧЕСКИ ВАЖНО: выводим стэк-трейс в консоль сервера
         ex.printStackTrace();
-
         return ResponseEntity
                 .status(500)
-                .body(ApiResponse.error("INTERNAL_SERVER_ERROR", "!!! ЭТО НОВЫЙ КОД !!! " + ex.getMessage()));
+                .body(ApiResponse.error("INTERNAL_SERVER_ERROR", "Server error " + ex.getMessage()));
     }
 }
